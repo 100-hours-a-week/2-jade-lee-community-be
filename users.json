@@ -1,0 +1,9 @@
+[
+  {
+    "user_id": 1,
+    "email": "test@startupcode.kr",
+    "password": "test1234",
+    "nickname": "startup",
+    "profile_image": "https://image.kr/img.jpg"
+  }
+]
