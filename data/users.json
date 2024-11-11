@@ -1,0 +1,8 @@
+[
+  {
+    "email": "example@example.com",
+    "password": "$2b$10$xV9zZdZXD1Th7EtCUt52ZOK3c5Rgf.gA7o4fP58LmWWQmSAz3RgPK",
+    "nickname": "User1",
+    "profile_image": "http://example.com/profile.jpg"
+  }
+]

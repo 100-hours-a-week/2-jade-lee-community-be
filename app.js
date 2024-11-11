@@ -1,13 +1,15 @@
 const express = require('express');
-const userRoutes = require('./routes/userRoutes');
-
 const app = express();
 app.use(express.json());
 
-// 사용자 라우터 설정
-app.use('/users', userRoutes);
+const authRoutes = require('./routes/authRoutes');
+const postRoutes = require('./routes/postRoutes');
+const commentRoutes = require('./routes/commentRoutes');
+const likeRoutes = require('./routes/likeRoutes');
 
-// 서버 시작
-app.listen(3000, () => {
-  console.log('서버가 http://localhost:3000 에서 실행 중입니다.');
-});
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/posts', postRoutes);
+app.use('/api/v1/posts/:postId/comments', commentRoutes);
+app.use('/api/v1/posts/:postId/like', likeRoutes);
+
+app.listen(3000, () => console.log('Server running on port 3000'));
