@@ -89,15 +89,63 @@ async function updatePostModel(postId, title, content, postImage, imageFlag) {
     const [result] = await connectDB.query(sql, values);
     return result.affectedRows > 0;
 }
-async function likePostModel(postId) {
-    let sql = 'UPDATE posts SET like_cnt = like_cnt + 1 WHERE post_id = ?';
-    const [result] = await connectDB.query(sql, postId);
-    return result.affectedRows > 0;
+
+async function likePostModel(postId, userId) {
+    const connection = await db();
+
+    // 1. 사용자의 좋아요 상태 확인
+    const checkSql = `
+        SELECT 1 
+        FROM post_likes 
+        WHERE post_id = ? AND user_id = ?
+    `;
+    const [rows] = await connection.query(checkSql, [postId, userId]);
+
+    if (rows.length > 0) {
+        // 이미 좋아요 상태 -> 좋아요 취소
+        const deleteLikeSql = `
+            DELETE FROM post_likes 
+            WHERE post_id = ? AND user_id = ?
+        `;
+        await connection.query(deleteLikeSql, [postId, userId]);
+        const decrementLikeCntSql = `
+            UPDATE posts 
+            SET like_cnt = like_cnt - 1 
+            WHERE post_id = ?
+        `;
+        await connection.query(decrementLikeCntSql, [postId]);
+        return { message: "like_removed" };
+    } else {
+        // 좋아요 상태가 아님 -> 좋아요 추가
+        const insertLikeSql = `
+            INSERT INTO post_likes (post_id, user_id) 
+            VALUES (?, ?)
+        `;
+        await connection.query(insertLikeSql, [postId, userId]);
+        const incrementLikeCntSql = `
+            UPDATE posts 
+            SET like_cnt = like_cnt + 1 
+            WHERE post_id = ?
+        `;
+        await connection.query(incrementLikeCntSql, [postId]);
+        return { message: "like_added" };
+    }
 }
+
 async function deletePostModel(postId) {
     const sql = 'UPDATE posts SET is_deleted = TRUE, updated_at = Now() WHERE post_id = ?';
     const [result] = await connectDB.query(sql, [postId]);
     return result.affectedRows > 0;
+}
+async function checkUserLikeStatus(postId, userId) {
+    const connection = await db();
+    const sql = `
+        SELECT 1 
+        FROM post_likes 
+        WHERE post_id = ? AND user_id = ?
+    `;
+    const [rows] = await connection.query(sql, [postId, userId]);
+    return rows.length > 0; // 좋아요가 존재하면 true
 }
 export {
     getPostAuth,
@@ -107,5 +155,6 @@ export {
     updatePostModel,
     deletePostModel,
     likePostModel,
-    viewCountModel
+    viewCountModel,
+    checkUserLikeStatus
 };

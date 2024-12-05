@@ -12,7 +12,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+let userHasLiked = false; // 좋아요 상태 관리
 const loadPosts = async (req, res) => {
     try {
         const posts = await getAllPostsModel();
@@ -117,21 +117,25 @@ const viewcntPost = async (req, res) => {
     }
 }
 const likePost = async (req, res) => {
-    try{
+    try {
         const postId = parseInt(req.params.post_id, 10);
-        const updatedPost = await likePostModel(postId)
+        const userId = req.session.user.user_id;
 
-        if (!updatedPost) {
-            return res.status(404).json({ message: "post_not_found" });
+        // 좋아요 상태를 토글
+        const result = await likePostModel(postId, userId);
+
+        if (result.message === "like_removed") {
+            return res.status(200).json({ message: "like_removed", data: result });
+        } else if (result.message === "like_added") {
+            return res.status(200).json({ message: "like_added", data: result });
         }
-        res.status(204).json({ message: "post_like_success", data: updatedPost });
-    }
-    catch (error){
+    } catch (error) {
         console.error("게시글 좋아요 오류:", error);
         res.status(500).json({ message: "internal_server_error" });
     }
-}
+};
 
+//
 const deletePost = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
