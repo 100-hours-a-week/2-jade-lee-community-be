@@ -35,7 +35,7 @@ app.use(
 );
 app.use(
     cors({
-        origin: 'http://localhost:3000', 
+        origin: 'http://3.34.40.191:3000',
         credentials: true, 
     })
 );
@@ -46,5 +46,5 @@ app.use('/user', userRoutes);
 app.use('/posts', postRoutes);
 app.use('/posts', commentRoutes);
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://3.34.40.191:8000:${PORT}`);
 });
