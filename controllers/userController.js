@@ -11,6 +11,9 @@ const __dirname = path.dirname(__filename);
 const getUser = (req, res) => {
     try {
         const user = req.session.user;
+        if (!user) {
+            return res.status(404).json({ message: '사용자가 존재하지 않습니다.' });
+        }
         res.status(200).json(user);
     } catch (error) {
         console.error('사용자 조회 오류:', error);
@@ -30,6 +33,9 @@ const updateUserProfile = async (req, res) => {
     try {
         const { user_id } = req.session.user;
         const { nickname, imageFlag } = req.body;
+        if (!user_id || !nickname || typeof imageFlag !== 'number') {
+            return res.status(400).json({ message: '필수 항목이 누락되었거나 잘못된 값입니다.' });
+        }
         let profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
         if (!nickname || !imageFlag) {
             return res.status(400).json({

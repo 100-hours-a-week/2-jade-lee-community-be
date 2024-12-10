@@ -43,8 +43,11 @@ const loadPosts = async (req, res) => {
 
 const createPost = async (req, res) => {
     try {
-        console.log(req.body);
         const { title, content } = req.body;
+        // 입력값 검증
+        if (!title || !content) {
+            return res.status(400).json({ message: "title_and_content_required" });
+        }
         const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
         const newPost = {
             title,
@@ -55,7 +58,7 @@ const createPost = async (req, res) => {
             view_cnt: 0,
             user_id: req.session.user.user_id,
         };
-        createPostModel(newPost);
+        await createPostModel(newPost);
         res.status(201).json({ message: "post_created_success" });
     } catch (error) {
         console.error("게시글 생성 오류:", error);
@@ -65,6 +68,9 @@ const createPost = async (req, res) => {
 const loadPostDetail = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
+        if (isNaN(postId)) {
+            return res.status(400).json({ message: "invalid_post_id" });
+        }
         const post = await getPostByIdModel(postId);
         if (!post) {
            return res.status(404).json({ message: "post_not_found" });
@@ -79,6 +85,11 @@ const updatePostDetail = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
         const { title, content, imageFlag } = req.body;
+
+        if (isNaN(postId) || !title || !content || typeof imageFlag !== "number") {
+            return res.status(400).json({ message: "invalid_input_data" });
+        }
+
         const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
         const existingPost = await getPostByIdModel(postId);
         if (!existingPost) {

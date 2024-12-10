@@ -5,9 +5,12 @@ import {
 } from '../models/commentModel.js';
 const createComment = (req, res) => {
     try {
-        console.log(req.body);
         const { content } = req.body;
         const post_id = parseInt(req.params.post_id, 10);
+        // 입력값 검증
+        if (isNaN(post_id) || !content) {
+            return res.status(400).json({ message: "invalid_input_data" });
+        }
         const newComment = {
             content,
             user_id: req.session.user.user_id,
@@ -37,6 +40,9 @@ const updateComment = async (req, res) => {
     try {
         const comment_id = parseInt(req.params.comment_id, 10);
         const { content } = req.body;
+        if (isNaN(comment_id) || !content) {
+            return res.status(400).json({ message: "invalid_input_data" });
+        }
         const updatedPost = await editCommentModel(comment_id, content);
         if (updatedPost == 0) {
             return res.status(404).json({ message: "comment_not_found" });
