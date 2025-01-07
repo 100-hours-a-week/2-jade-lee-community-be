@@ -40,11 +40,12 @@ app.use(
     })
 );
 const uploadDir = path.join(__dirname, 'uploads');
-app.use('/uploads', express.static(uploadDir));
-app.use('/auth', authRoutes);
-app.use('/user', userRoutes);
-app.use('/posts', postRoutes);
-app.use('/posts', commentRoutes);
+app.use('/api/uploads', express.static(uploadDir));
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/posts', commentRoutes);
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://3.34.40.191:8000:${PORT}`);
 });
