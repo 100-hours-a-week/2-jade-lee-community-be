@@ -40,7 +40,7 @@ app.use(
     })
 );
 const uploadDir = path.join(__dirname, 'uploads');
-app.use('/api/uploads', express.static(uploadDir));
+app.use('/uploads', express.static(uploadDir));
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/posts', postRoutes);

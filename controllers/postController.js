@@ -85,7 +85,8 @@ const updatePostDetail = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
         const { title, content, imageFlag } = req.body;
-
+        console.log('Request body:', req.body);
+        console.log('Request file:', req.file);
         if (isNaN(postId) || !title || !content || typeof imageFlag !== "number") {
             return res.status(400).json({ message: "invalid_input_data" });
         }
