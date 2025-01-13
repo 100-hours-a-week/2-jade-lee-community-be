@@ -33,20 +33,23 @@ const updateUserProfile = async (req, res) => {
     try {
         const { user_id } = req.session.user;
         const { nickname, imageFlag } = req.body;
-        if (!user_id || !nickname || typeof imageFlag !== 'number') {
+
+        // imageFlag를 숫자로 변환
+        const numericImageFlag = parseInt(imageFlag, 10);
+
+        // 입력 데이터 유효성 검증
+        if (!user_id || !nickname || isNaN(numericImageFlag)) {
             return res.status(400).json({ message: '필수 항목이 누락되었거나 잘못된 값입니다.' });
         }
+
+        // 프로필 이미지 처리
         let profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
-        if (!nickname || !imageFlag) {
-            return res.status(400).json({
-                success: false,
-                message: '필수 항목이 누락되었습니다.'
-            });
-        }
-        const previousImagePath = req.session.user.profileImage 
-            ? path.join(__dirname, '..', req.session.user.profileImage)
-            : null;
-        if (imageFlag == 1) {
+
+        if (numericImageFlag === 1) {
+            const previousImagePath = req.session.user.profileImage
+                ? path.join(__dirname, '..', req.session.user.profileImage)
+                : null;
+
             if (previousImagePath) {
                 fs.unlink(previousImagePath, (err) => {
                     if (err) {
@@ -56,18 +59,24 @@ const updateUserProfile = async (req, res) => {
                     }
                 });
             }
+
             req.session.user.profileImage = profileImage;
         } else {
             profileImage = req.session.user.profileImage || null;
         }
-        updateProfileModel(user_id, nickname, profileImage, imageFlag);
+
+        // 프로필 업데이트
+        await updateProfileModel(user_id, nickname, profileImage, numericImageFlag);
+
         req.session.user.nickname = nickname;
+
         res.status(204).json({ message: '프로필이 업데이트되었습니다.' });
     } catch (error) {
         console.error('프로필 업데이트 오류:', error);
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 };
+
 const updateUserPass= async (req, res) => {
     try {
         const { user_id } = req.session.user;
