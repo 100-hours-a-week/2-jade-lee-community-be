@@ -85,20 +85,24 @@ const updatePostDetail = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
         const { title, content, imageFlag } = req.body;
-        console.log('Request body:', req.body);
-        console.log('Request file:', req.file);
-        if (isNaN(postId) || !title || !content || typeof imageFlag !== "number") {
+        const numericImageFlag = parseInt(imageFlag, 10);
+
+        // 입력 데이터 유효성 검증
+        if (isNaN(postId) || !title || !content || isNaN(numericImageFlag)) {
             return res.status(400).json({ message: "invalid_input_data" });
         }
 
         const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
         const existingPost = await getPostByIdModel(postId);
+
+        // 게시글 존재 여부 확인
         if (!existingPost) {
             return res.status(404).json({ message: "post_not_found" });
         }
 
-        if (imageFlag == 1 && existingPost.photo_url) {
-            const previousImagePath = path.join(__dirname, '..', existingPost.image_url);
+        // 기존 이미지 삭제 (이미지가 변경된 경우)
+        if (numericImageFlag === 1 && existingPost.photo_url) {
+            const previousImagePath = path.join(__dirname, '..', existingPost.photo_url);
             fs.unlink(previousImagePath, (err) => {
                 if (err) {
                     console.error('기존 이미지 삭제 오류:', err);
@@ -107,16 +111,20 @@ const updatePostDetail = async (req, res) => {
                 }
             });
         }
-        const updatedPost = updatePostModel(postId, title, content, postImage, imageFlag);
+
+        // 게시글 업데이트
+        const updatedPost = await updatePostModel(postId, title, content, postImage, numericImageFlag);
         if (!updatedPost) {
             return res.status(404).json({ message: "post_not_found" });
         }
+
         res.status(204).json({ message: "post_updated_success", data: updatedPost });
     } catch (error) {
         console.error("게시글 수정 오류:", error);
         res.status(500).json({ message: "internal_server_error" });
     }
 };
+
 const viewcntPost = async (req, res) => {
     try{
         const postId = parseInt(req.params.post_id, 10);
