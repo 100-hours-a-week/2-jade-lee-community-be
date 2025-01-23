@@ -35,8 +35,8 @@ app.use(
 );
 app.use(
     cors({
-        origin: 'http://3.34.40.191:3000',
-        credentials: true, 
+        origin: ['http://3.34.40.191:3000', 'http://3.34.40.191'], // 여러 출처를 허용
+        credentials: true, // 쿠키와 인증 정보 포함 허용
     })
 );
 const uploadDir = path.join(__dirname, 'uploads');
