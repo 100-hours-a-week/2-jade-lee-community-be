@@ -35,7 +35,7 @@ app.use(
 );
 app.use(
     cors({
-        origin: ['http://3.34.40.191:3000', 'http://3.34.40.191'], // 여러 출처를 허용
+        origin: ['http://43.201.148.13:3000', 'http://43.201.148.13'], // 여러 출처를 허용
         credentials: true, // 쿠키와 인증 정보 포함 허용
     })
 );
@@ -47,5 +47,5 @@ app.use('/api/posts', postRoutes);
 app.use('/api/posts', commentRoutes);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://3.34.40.191:8000:${PORT}`);
+    console.log(`Server is running on http://43.201.148.13:8000:${PORT}`);
 });
